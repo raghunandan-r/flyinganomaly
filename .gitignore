@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.env
+venv/
+node_modules/
+.DS_Store
+.idea/
+.vscode/
+dist/
+build/
+*.log
+postgres_data/
+redpanda_data/
+grafana_data/
