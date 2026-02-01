@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "type": "flight_state",
+  "produced_at": "2026-01-09T12:00:00.000Z",
+  "source": {
+    "provider": "opensky",
+    "mode": "live",
+    "bbox": {
+      "lat_min": 40.40,
+      "lat_max": 41.20,
+      "lon_min": -74.50,
+      "lon_max": -73.50
+    },
+    "poll_interval_s": 10
+  },
+  "payload": {
+    "icao24": "a0b1c2",
+    "callsign": "UAL123",
+    "position": {
+      "lat": 40.6413,
+      "lon": -73.7781
+    },
+    "altitude_m": 3048.0,
+    "geo_altitude_m": 3100.0,
+    "velocity_mps": 125.5,
+    "heading_deg": 270.0,
+    "vertical_rate_mps": -5.2,
+    "on_ground": false,
+    "squawk": "1200",
+    "spi": false,
+    "time_position_unix": 1704672000,
+    "last_contact_unix": 1704672005
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "type": "snapshot",
+  "timestamp": "2026-01-09T12:00:00.000Z",
+  "sequence": 0,
+  "flights": [
+    {
+      "icao24": "a0b1c2",
+      "callsign": "UAL123",
+      "position": {
+        "lat": 40.6413,
+        "lon": -73.7781
+      },
+      "altitude_m": 3048.0,
+      "heading_deg": 270.0,
+      "velocity_mps": 125.5,
+      "vertical_rate_mps": -2.1,
+      "on_ground": false,
+      "status": "NORMAL"
+    },
+    {
+      "icao24": "deadbe",
+      "callsign": "AAL456",
+      "position": {
+        "lat": 40.7500,
+        "lon": -73.8500
+      },
+      "altitude_m": 1524.0,
+      "heading_deg": 90.0,
+      "velocity_mps": 80.0,
+      "vertical_rate_mps": 0.0,
+      "on_ground": false,
+      "status": "NORMAL"
+    }
+  ]
+}

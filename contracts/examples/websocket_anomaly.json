@@ -1,0 +1,20 @@
+{
+  "type": "anomaly",
+  "timestamp": "2026-01-09T12:00:15.000Z",
+  "payload": {
+    "icao24": "a0b1c2",
+    "callsign": "UAL123",
+    "anomaly_type": "EMERGENCY_DESCENT",
+    "severity": "HIGH",
+    "detected_at": "2026-01-09T12:00:15.000Z",
+    "position": {
+      "lat": 40.65,
+      "lon": -73.77
+    },
+    "details": {
+      "descent_rate_fpm": -4000,
+      "descent_rate_mps": -20.3,
+      "confirmed_samples": 3
+    }
+  }
+}

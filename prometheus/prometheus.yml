@@ -1,0 +1,47 @@
+# Prometheus configuration for SkySentinel
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'skysentinel'
+    environment: 'development'
+
+# Alertmanager configuration (optional - can be added later)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+# Load alerting rules
+rule_files:
+  - 'alerts.yml'
+
+# Scrape configurations
+scrape_configs:
+  # Producer metrics
+  - job_name: 'producer'
+    static_configs:
+      - targets: ['producer:8001']
+        labels:
+          service: 'flight-producer'
+
+  # Backend API metrics
+  - job_name: 'backend'
+    static_configs:
+      - targets: ['backend:8000']
+        labels:
+          service: 'backend-api'
+    metrics_path: '/metrics'
+
+  # Processing (Bytewax) metrics
+  - job_name: 'processing'
+    static_configs:
+      - targets: ['processing:8080']
+        labels:
+          service: 'bytewax-processor'
+    scrape_interval: 30s
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

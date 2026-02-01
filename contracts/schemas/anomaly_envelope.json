@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Anomaly Event Envelope Schema",
+  "description": "Schema for AnomalyEventEnvelope used in flights.anomalies topic",
+  "definitions": {
+    "position": {
+      "type": "object",
+      "required": ["lat", "lon"],
+      "properties": {
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        }
+      }
+    },
+    "anomalyPayload": {
+      "type": "object",
+      "required": ["icao24", "anomaly_type", "severity", "detected_at", "position"],
+      "properties": {
+        "icao24": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{6}$",
+          "description": "ICAO 24-bit address"
+        },
+        "callsign": {
+          "type": ["string", "null"],
+          "description": "Aircraft callsign"
+        },
+        "anomaly_type": {
+          "type": "string",
+          "enum": [
+            "EMERGENCY_DESCENT",
+            "GO_AROUND",
+            "HOLDING",
+            "LOW_ALTITUDE_WARNING",
+            "SQUAWK_7700",
+            "SQUAWK_7600",
+            "SQUAWK_7500",
+            "SQUAWK_EMERGENCY"
+          ],
+          "description": "Type of anomaly detected"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["LOW", "MEDIUM", "HIGH"],
+          "description": "Severity level"
+        },
+        "detected_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when anomaly was detected"
+        },
+        "position": {
+          "$ref": "#/definitions/position"
+        },
+        "details": {
+          "type": "object",
+          "description": "Anomaly-specific details",
+          "additionalProperties": true
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["provider"],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": ["skysentinel-processing"],
+          "description": "Source of anomaly detection"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "title": "AnomalyEventEnvelope",
+  "required": ["schema_version", "type", "produced_at", "source", "payload"],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Schema version"
+    },
+    "type": {
+      "type": "string",
+      "const": "anomaly_event",
+      "description": "Message type"
+    },
+    "produced_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when message was produced"
+    },
+    "source": {
+      "$ref": "#/definitions/source"
+    },
+    "payload": {
+      "$ref": "#/definitions/anomalyPayload"
+    }
+  }
+}

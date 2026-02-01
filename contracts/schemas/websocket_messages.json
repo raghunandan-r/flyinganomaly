@@ -1,0 +1,170 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WebSocket Messages Schema",
+  "description": "Schema for WebSocket messages sent from backend to frontend",
+  "definitions": {
+    "position": {
+      "type": "object",
+      "required": ["lat", "lon"],
+      "properties": {
+        "lat": {"type": "number", "minimum": -90, "maximum": 90},
+        "lon": {"type": "number", "minimum": -180, "maximum": 180}
+      }
+    },
+    "flightState": {
+      "type": "object",
+      "required": ["icao24", "position", "on_ground"],
+      "properties": {
+        "icao24": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{6}$"
+        },
+        "callsign": {
+          "type": ["string", "null"]
+        },
+        "position": {
+          "$ref": "#/definitions/position"
+        },
+        "altitude_m": {
+          "type": ["number", "null"]
+        },
+        "heading_deg": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 360,
+          "exclusiveMaximum": true
+        },
+        "velocity_mps": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "vertical_rate_mps": {
+          "type": ["number", "null"]
+        },
+        "on_ground": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["NORMAL", "STALE", "ANOMALY"],
+          "default": "NORMAL"
+        }
+      }
+    },
+    "anomalyPayload": {
+      "type": "object",
+      "required": ["icao24", "anomaly_type", "severity", "position"],
+      "properties": {
+        "icao24": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{6}$"
+        },
+        "callsign": {
+          "type": ["string", "null"]
+        },
+        "anomaly_type": {
+          "type": "string",
+          "enum": [
+            "EMERGENCY_DESCENT",
+            "GO_AROUND",
+            "HOLDING",
+            "LOW_ALTITUDE_WARNING",
+            "SQUAWK_7700",
+            "SQUAWK_7600",
+            "SQUAWK_7500",
+            "SQUAWK_EMERGENCY"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["LOW", "MEDIUM", "HIGH"]
+        },
+        "position": {
+          "$ref": "#/definitions/position"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "title": "SnapshotMessage",
+      "type": "object",
+      "required": ["type", "timestamp", "sequence", "flights"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "snapshot"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "flights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flightState"
+          }
+        }
+      }
+    },
+    {
+      "title": "DeltaMessage",
+      "type": "object",
+      "required": ["type", "timestamp", "sequence", "upserts", "removed"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "delta"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "upserts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/flightState"
+          }
+        },
+        "removed": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{6}$"
+          },
+          "description": "List of icao24 values for removed flights"
+        }
+      }
+    },
+    {
+      "title": "AnomalyMessage",
+      "type": "object",
+      "required": ["type", "timestamp", "payload"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "anomaly"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "payload": {
+          "$ref": "#/definitions/anomalyPayload"
+        }
+      }
+    }
+  ]
+}

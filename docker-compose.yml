@@ -1,0 +1,183 @@
+services:
+  redpanda:
+    image: redpandadata/redpanda:v24.1.1
+    container_name: redpanda
+    command:
+      - redpanda start
+      - --smp 1
+      - --memory 1G
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:9092
+    ports:
+      - "9092:9092"
+      - "9644:9644"
+    healthcheck:
+      test: ["CMD", "rpk", "cluster", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - skysentinel
+
+  topic-init:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile
+    container_name: topic_init
+    env_file: .env
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    command: python3 init_topics.py
+    restart: "no"
+    networks:
+      - skysentinel
+
+  integration-agent:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile
+    container_name: integration_agent
+    env_file: .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/app/project
+    depends_on:
+      - redpanda
+      - postgres
+    restart: unless-stopped
+    networks:
+      - skysentinel
+    environment:
+      - BACKEND_URL=http://backend:8000
+      - PROCESSING_URL=http://processing:8080
+      - PROJECT_ROOT=/app/project
+
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: postgres
+    environment:
+      POSTGRES_DB: skysentinel
+      POSTGRES_USER: skysentinel
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-skysentinel}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skysentinel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - skysentinel
+
+  producer:
+    build:
+      context: ./ingestion
+      dockerfile: Dockerfile
+    container_name: flight_producer
+    env_file: .env
+    volumes:
+      - ./fixtures:/app/fixtures:ro
+      - ./static:/app/static:ro
+    depends_on:
+      topic-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    networks:
+      - skysentinel
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_api
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      topic-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    networks:
+      - skysentinel
+
+  processing:
+    build:
+      context: ./processing
+      dockerfile: Dockerfile
+    container_name: bytewax_processor
+    env_file: .env
+    volumes:
+      - ./static:/app/static:ro
+    depends_on:
+      topic-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - phase2
+    networks:
+      - skysentinel
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - skysentinel
+
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    profiles:
+      - observability
+    networks:
+      - skysentinel
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    profiles:
+      - observability
+    networks:
+      - skysentinel
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  skysentinel:
+    driver: bridge

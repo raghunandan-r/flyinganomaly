@@ -1,0 +1,27 @@
+# prometheus/alerts.yml
+groups:
+  - name: skysentinel
+    rules:
+      - alert: ProducerDown
+        expr: up{job="producer"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Flight producer is down"
+      
+      - alert: HighConsumerLag
+        expr: backend_kafka_consumer_lag > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka consumer lag is high"
+      
+      - alert: NoFlightsIngested
+        expr: rate(producer_flights_published_total[5m]) == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No flights being ingested"

@@ -1,0 +1,22 @@
+{
+  "type": "delta",
+  "timestamp": "2026-01-09T12:00:10.000Z",
+  "sequence": 43,
+  "upserts": [
+    {
+      "icao24": "a0b1c2",
+      "callsign": "UAL123",
+      "position": {
+        "lat": 40.6500,
+        "lon": -73.7700
+      },
+      "altitude_m": 3100.0,
+      "heading_deg": 271.0,
+      "velocity_mps": 126.0,
+      "vertical_rate_mps": -1.8,
+      "on_ground": false,
+      "status": "NORMAL"
+    }
+  ],
+  "removed": ["abc123", "def456"]
+}

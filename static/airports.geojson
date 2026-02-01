@@ -1,0 +1,66 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "code": "JFK",
+        "name": "John F. Kennedy International",
+        "type": "major",
+        "runway_heading_primary": 310
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[-73.82, 40.62], [-73.75, 40.62], [-73.75, 40.67], [-73.82, 40.67], [-73.82, 40.62]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "code": "LGA",
+        "name": "LaGuardia",
+        "type": "major"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-73.8740, 40.7769]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "code": "EWR",
+        "name": "Newark Liberty International",
+        "type": "major"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.1745, 40.6895]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "code": "TEB",
+        "name": "Teterboro",
+        "type": "general_aviation"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.0608, 40.8501]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "code": "HPN",
+        "name": "Westchester County",
+        "type": "regional"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-73.7076, 41.0670]
+      }
+    }
+  ]
+}
