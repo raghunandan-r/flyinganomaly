@@ -29,7 +29,8 @@ export function FlightGlobe({
   useEffect(() => {
     if (!globeEl.current) return;
 
-    const globe = Globe()(globeEl.current)
+    // Globe.gl uses factory pattern at runtime but types expect constructor
+    const globe = (Globe as any)()(globeEl.current)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
@@ -110,9 +111,9 @@ export function FlightGlobe({
     // Rotate camera to match heading
     if (heading_deg !== null) {
       // Globe.gl uses radians, and heading is 0-360 degrees (0 = North)
-      const headingRad = ((heading_deg - 90) * Math.PI) / 180;
       // Note: Globe.gl doesn't directly support camera rotation, but we can
       // use the pointOfView with a slight offset to simulate following
+      // const headingRad = ((heading_deg - 90) * Math.PI) / 180;
     }
   }, [selectedFlight, cockpitView]);
 

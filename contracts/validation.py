@@ -90,8 +90,8 @@ class FlightPayload(BaseModel):
 
 class FlightStateEnvelope(BaseModel):
     """Envelope for flights.state topic (compacted)."""
-    schema_version: int = Field(default=SCHEMA_VERSION, const=True)
-    type: Literal["flight_state"] = Field(default=MESSAGE_TYPE_FLIGHT_STATE, const=True)
+    schema_version: Literal[1] = SCHEMA_VERSION
+    type: Literal["flight_state"] = MESSAGE_TYPE_FLIGHT_STATE
     produced_at: datetime
     source: SourceInfo
     payload: FlightPayload
@@ -107,8 +107,8 @@ class FlightStateEnvelope(BaseModel):
 
 class FlightUpdateEnvelope(BaseModel):
     """Envelope for flights.updates topic (append-only)."""
-    schema_version: int = Field(default=SCHEMA_VERSION, const=True)
-    type: Literal["flight_update"] = Field(default=MESSAGE_TYPE_FLIGHT_UPDATE, const=True)
+    schema_version: Literal[1] = SCHEMA_VERSION
+    type: Literal["flight_update"] = MESSAGE_TYPE_FLIGHT_UPDATE
     produced_at: datetime
     source: SourceInfo
     payload: FlightPayload
@@ -162,8 +162,8 @@ class AnomalyPayload(BaseModel):
 
 class AnomalyEventEnvelope(BaseModel):
     """Envelope for flights.anomalies topic."""
-    schema_version: int = Field(default=SCHEMA_VERSION, const=True)
-    type: Literal["anomaly_event"] = Field(default=MESSAGE_TYPE_ANOMALY_EVENT, const=True)
+    schema_version: Literal[1] = SCHEMA_VERSION
+    type: Literal["anomaly_event"] = MESSAGE_TYPE_ANOMALY_EVENT
     produced_at: datetime
     source: SourceInfo
     payload: AnomalyPayload

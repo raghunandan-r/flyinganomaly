@@ -2,7 +2,7 @@
  * Main App component
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FlightGlobe } from './components/FlightGlobe';
 import { FlightFiltersComponent } from './components/FlightFilters';
 import { StatusBar } from './components/StatusBar';

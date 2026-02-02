@@ -77,8 +77,8 @@ services:
 
   producer:
     build:
-      context: ./ingestion
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ingestion/Dockerfile
     container_name: flight_producer
     env_file: .env
     volumes:
@@ -93,8 +93,8 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: backend_api
     ports:
       - "8000:8000"
@@ -108,8 +108,8 @@ services:
 
   processing:
     build:
-      context: ./processing
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: processing/Dockerfile
     container_name: bytewax_processor
     env_file: .env
     volumes:

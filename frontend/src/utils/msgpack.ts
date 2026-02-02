@@ -7,7 +7,7 @@
  * Decode MessagePack message (placeholder - would require msgpack-lite or similar)
  * For now, we're using JSON only
  */
-export function decodeMessagePack(data: ArrayBuffer): unknown {
+export function decodeMessagePack(_data: ArrayBuffer): unknown {
   // Placeholder - would implement with actual MessagePack library
   throw new Error('MessagePack not yet implemented');
 }

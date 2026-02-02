@@ -12,7 +12,8 @@ import type {
   DeltaMessage,
 } from '../types/flight';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/flights';
+// Use relative URL to go through nginx proxy, or direct URL if specified
+const WS_URL = import.meta.env.VITE_WS_URL || `ws://${window.location.host}/ws/flights`;
 const RECONNECT_DELAY_INITIAL = 1000; // Start with 1 second
 const RECONNECT_DELAY_MAX = 30000; // Max 30 seconds
 const RECONNECT_DELAY_MULTIPLIER = 1.5;
@@ -43,7 +44,7 @@ export function useFlightStream() {
     }));
 
     try {
-      const ws = new WebSocket(WS_URL, ['json']);
+      const ws = new WebSocket(WS_URL);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -57,9 +58,12 @@ export function useFlightStream() {
       };
 
       ws.onmessage = (event) => {
+        console.log('WebSocket message received, length:', event.data.length);
         try {
           const message: WebSocketMessage = JSON.parse(event.data);
+          console.log('Parsed message type:', message.type, 'flights:', (message as any).flights?.length);
           handleMessage(message);
+          console.log('Message handled successfully');
         } catch (error) {
           console.error('Failed to parse WebSocket message:', error);
           setState((prev) => ({
@@ -78,8 +82,8 @@ export function useFlightStream() {
         }));
       };
 
-      ws.onclose = () => {
-        console.log('WebSocket closed');
+      ws.onclose = (event) => {
+        console.log('WebSocket closed, code:', event.code, 'reason:', event.reason, 'wasClean:', event.wasClean);
         wsRef.current = null;
         setState((prev) => ({
           ...prev,
@@ -91,6 +95,7 @@ export function useFlightStream() {
           reconnectDelayRef.current,
           RECONNECT_DELAY_MAX
         );
+        console.log('Reconnecting in', delay, 'ms');
         reconnectTimeoutRef.current = window.setTimeout(() => {
           reconnectDelayRef.current *= RECONNECT_DELAY_MULTIPLIER;
           connect();
@@ -140,13 +145,13 @@ export function useFlightStream() {
       });
 
       flightsRef.current = flights;
-      setState((prev) => ({
+      setState({
         flights,
         lastUpdate: now,
         sequence: delta.sequence,
         connectionStatus: 'connected',
         error: null,
-      }));
+      });
     } else if (message.type === 'anomaly') {
       // Update flight status to ANOMALY
       const flights = new Map(flightsRef.current);
